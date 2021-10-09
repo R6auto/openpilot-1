@@ -682,13 +682,6 @@ CommunityPanel::CommunityPanel(QWidget* parent) : QWidget(parent) {
 
   QList<ParamControl*> toggles;
 
-
-
-  toggles.append(new ParamControl("PutPrebuilt",
-                                            "Prebuilt Enable",
-                                            "Create prebuilt files to speed up load time.",
-                                            "../assets/offroad/icon_road.png",
-                                            this));
   toggles.append(new ParamControl("AR",
                                             "Enable Auto Record",
                                             "Starts recording on car start and stops on car off.",
@@ -725,7 +718,11 @@ CommunityPanel::CommunityPanel(QWidget* parent) : QWidget(parent) {
                                             "../assets/offroad/icon_road.png",
                                             this));
 
-
+  toggles.append(new ParamControl("LowSpeedAlerts",
+                                            "Enable Low Steer Speed Alerts",
+                                            "",
+                                            "../assets/offroad/icon_road.png",
+                                            this));
   toggles.append(new ParamControl("UseSMDPSHarness",
                                             "Use SMDPS Harness",
                                             "Use of MDPS Harness to enable openpilot steering down to 0 MPH",
