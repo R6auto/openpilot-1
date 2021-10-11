@@ -1,27 +1,5 @@
 #pragma once
 
-#define UI_FEATURE_BRAKE 1
-#define UI_FEATURE_AUTOHOLD 1
-#define UI_FEATURE_DASHCAM 1
-
-#define UI_FEATURE_LEFT 1
-#define UI_FEATURE_RIGHT 1
-
-#define UI_FEATURE_LEFT_Y 220
-#define UI_FEATURE_RIGHT_Y 10
-
-#define UI_FEATURE_LEFT_REL_DIST 1
-#define UI_FEATURE_LEFT_REL_SPEED 1
-#define UI_FEATURE_LEFT_REAL_STEER 1
-#define UI_FEATURE_LEFT_DESIRED_STEER 1
-
-#define UI_FEATURE_RIGHT_CPU_TEMP 1
-#define UI_FEATURE_RIGHT_AMBIENT_TEMP 1
-#define UI_FEATURE_RIGHT_BATTERY_LEVEL 1
-#define UI_FEATURE_RIGHT_GPS_ALTITUDE 1
-#define UI_FEATURE_RIGHT_GPS_ACCURACY 1
-#define UI_FEATURE_RIGHT_GPS_SATELLITE 1
-
 #include <atomic>
 #include <map>
 #include <memory>
@@ -47,9 +25,16 @@
 #define COLOR_BLACK_ALPHA(x) nvgRGBA(0, 0, 0, x)
 #define COLOR_WHITE nvgRGBA(255, 255, 255, 255)
 #define COLOR_WHITE_ALPHA(x) nvgRGBA(255, 255, 255, x)
-#define COLOR_RED_ALPHA(x) nvgRGBA(201, 34, 49, x)
-#define COLOR_YELLOW nvgRGBA(218, 202, 37, 255)
-#define COLOR_RED nvgRGBA(201, 34, 49, 255)
+#define COLOR_RED nvgRGBA(255, 0, 0, 255)
+#define COLOR_RED_ALPHA(x) nvgRGBA(255, 0, 0, x)
+#define COLOR_YELLOW nvgRGBA(255, 255, 0, 255)
+#define COLOR_YELLOW_ALPHA(x) nvgRGBA(255, 255, 0, x)
+#define COLOR_ENGAGED nvgRGBA(23, 134, 68, 255)
+#define COLOR_ENGAGED_ALPHA(x) nvgRGBA(23, 134, 68, x)
+#define COLOR_WARNING nvgRGBA(218, 111, 37, 255)
+#define COLOR_WARNING_ALPHA(x) nvgRGBA(218, 111, 37, x)
+#define COLOR_ENGAGEABLE nvgRGBA(23, 51, 73, 255)
+#define COLOR_ENGAGEABLE_ALPHA(x) nvgRGBA(23, 51, 73, x)
 
 typedef cereal::CarControl::HUDControl::AudibleAlert AudibleAlert;
 
