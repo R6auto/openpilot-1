@@ -395,17 +395,6 @@ static void bb_ui_draw_debug(UIState *s)
     ui_draw_text(s, text_x, y, str, 22 * 2.5, textColor, "sans-regular");
 }
 
-
-static void bb_ui_draw_UI(UIState *s)
-{
-
-
-  bb_ui_draw_basic_info(s);
-
-  if(s->show_debug_ui)
-    bb_ui_draw_debug(s);
-}
-
 /*
 static void ui_draw_vision_scc_gap(UIState *s) {
   const UIScene *scene = &s->scene;
@@ -881,6 +870,9 @@ static void ui_draw_vision(UIState *s) {
   ui_draw_gps(s);
   ui_draw_tpms(s);
   bb_ui_draw_UI(s);
+  bb_ui_draw_basic_info(s);
+  if(s->show_debug_ui)
+    bb_ui_draw_debug(s);
 
 #if UI_FEATURE_DASHCAM
    if(s->awake && Hardware::EON())

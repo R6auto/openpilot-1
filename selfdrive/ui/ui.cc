@@ -123,6 +123,17 @@ static void update_state(UIState *s) {
     scene.engageable = cs.getEngageable() || cs.getEnabled();
     scene.dm_active = sm["driverMonitoringState"].getDriverMonitoringState().getIsActiveMode();
   }
+  if (scene.started && sm.updated("controlsState")) {
+    scene.controls_state = sm["controlsState"].getControlsState();
+  }
+  if (sm.updated("carState")) {
+    scene.car_state = sm["carState"].getCarState();
+    if(scene.leftBlinker!=scene.car_state.getLeftBlinker() || scene.rightBlinker!=scene.car_state.getRightBlinker()){
+      scene.blinkingrate = 120;
+    }
+    scene.leftBlinker = scene.car_state.getLeftBlinker();
+    scene.rightBlinker = scene.car_state.getRightBlinker();
+  }
   if (sm.updated("modelV2") && s->vg) {
     auto model = sm["modelV2"].getModelV2();
     update_model(s, model);
@@ -144,6 +155,10 @@ static void update_state(UIState *s) {
         scene.view_from_calib.v[i*3 + j] = view_from_calib(i,j);
       }
     }
+  }
+  if (sm.updated("deviceState")) {
+    scene.deviceState = sm["deviceState"].getDeviceState();
+    scene.cpuTempAvg = (scene.deviceState.getCpuTempC()[0] + scene.deviceState.getCpuTempC()[1] + scene.deviceState.getCpuTempC()[2] + scene.deviceState.getCpuTempC()[3]) / 4;
   }
   if (sm.updated("pandaStates")) {
     auto pandaStates = sm["pandaStates"].getPandaStates();
