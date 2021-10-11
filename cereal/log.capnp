@@ -1520,7 +1520,7 @@ struct Event {
     logMessage @18 :Text;
 
     # neokii
-    roadLimitSpeed @82 :RoadLimitSpeed;
+    roadLimitSpeed @83 :RoadLimitSpeed;
 
     # *********** debug ***********
     testJoystick @52 :Joystick;
