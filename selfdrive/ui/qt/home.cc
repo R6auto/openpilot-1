@@ -89,6 +89,7 @@ void HomeWindow::mousePressEvent(QMouseEvent* e) {
     sidebar->setVisible(!sidebar->isVisible() && !onroad->isMapVisible());
   }
 }
+}
 
 // OffroadHome: the offroad home page
 
