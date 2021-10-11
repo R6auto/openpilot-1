@@ -672,25 +672,6 @@ static void ui_draw_vision_maxspeed(UIState *s) {
   }
 }
 
-static void ui_draw_vision_event(UIState *s) {
-  if (s->scene.engageable) {
-    // draw steering wheel
-    const int radius = 96;
-    const int center_x = s->fb_w - radius - bdr_s * 2;
-    const int center_y = radius  + (bdr_s * 1.5);
-    const QColor &color = bg_colors[s->status];
-    NVGcolor nvg_color = nvgRGBA(color.red(), color.green(), color.blue(), color.alpha());
-    ui_draw_circle_image(s, center_x, center_y, radius, "wheel", nvg_color, 1.0f);
-  }
-}
-
-static void ui_draw_vision_face(UIState *s) {
-  const int radius = 96;
-  const int center_x = radius + (bdr_s * 2);
-  const int center_y = s->fb_h - footer_h / 2;
-  ui_draw_circle_image(s, center_x, center_y, radius, "driver_face", s->scene.dm_active);
-}
-
 static void ui_draw_vision_header(UIState *s) {
   NVGpaint gradient = nvgLinearGradient(s->vg, 0, header_h - (header_h / 2.5), 0, header_h,
                                         nvgRGBAf(0, 0, 0, 0.45), nvgRGBAf(0, 0, 0, 0));
