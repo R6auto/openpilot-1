@@ -45,7 +45,6 @@ private:
   LabelControl *versionLbl;
   LabelControl *lastUpdateLbl;
   ButtonControl *updateBtn;
-  ButtonControl *DUISR;
 
   Params params;
   QFileSystemWatcher *fs_watch;

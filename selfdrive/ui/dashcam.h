@@ -2,8 +2,6 @@
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "selfdrive/common/params.cc"
-
 
 #define CAPTURE_STATE_NONE 0
 #define CAPTURE_STATE_CAPTURING 1
@@ -299,8 +297,7 @@ static void screen_draw_button(UIState *s, int touch_x, int touch_y) {
     }
 }
 
-void screen_toggle_record_state(){
-
+void screen_toggle_record_state() {
   if (captureState == CAPTURE_STATE_CAPTURING) {
     stop_capture();
     lock_current_video = false;
@@ -322,7 +319,9 @@ void screen_toggle_lock() {
 }
 
 bool dashcam( UIState *s, int touch_x, int touch_y ) {
+
   bool touched = false;
+  
   screen_draw_button(s, touch_x, touch_y);
   if (screen_button_clicked(touch_x,touch_y)) {
     click_elapsed_time = get_time() - click_time;
@@ -338,19 +337,6 @@ bool dashcam( UIState *s, int touch_x, int touch_y ) {
     stop_capture();
   }
   //s->scene.recording = (captureState != CAPTURE_STATE_NOT_CAPTURING);
-  
-  int count = 0;
-
-    if (Params().getBool("AR") && !Params().getBool("IsOffroad") && count == 0 && captureState == CAPTURE_STATE_NOT_CAPTURING) {
-      start_capture();
-      ++count;
-    }
-  
-
-    if (Params().getBool("AR") && Params().getBool("IsOffroad") && count > 0 && captureState == CAPTURE_STATE_CAPTURING) {
-      stop_capture();
-      count = 0;
-    }
   
   return touched;
 }

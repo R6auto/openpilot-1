@@ -1,4 +1,5 @@
 #include "selfdrive/ui/qt/widgets/prime.h"
+
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -13,7 +14,6 @@
 #include "selfdrive/ui/qt/request_repeater.h"
 #include "selfdrive/ui/qt/util.h"
 #include "selfdrive/ui/qt/qt_window.h"
-
 
 using qrcodegen::QrCode;
 
@@ -120,19 +120,19 @@ PrimeUserWidget::PrimeUserWidget(QWidget* parent) : QWidget(parent) {
   primeLayout->setMargin(0);
   primeWidget->setContentsMargins(60, 50, 60, 50);
 
-  QLabel* subscribed = new QLabel("✓ RetroPilot Online");
+  QLabel* subscribed = new QLabel("✓ SUBSCRIBED");
   subscribed->setStyleSheet("font-size: 41px; font-weight: bold; color: #86FF4E;");
   primeLayout->addWidget(subscribed, 0, Qt::AlignTop);
 
   primeLayout->addSpacing(60);
 
-  QLabel* commaPrime = new QLabel("Circuit Pro HKG");
+  QLabel* commaPrime = new QLabel("comma prime");
   commaPrime->setStyleSheet("font-size: 75px; font-weight: bold;");
   primeLayout->addWidget(commaPrime, 0, Qt::AlignTop);
 
   primeLayout->addSpacing(20);
 
-  QLabel* connectUrl = new QLabel("Welcome To The Community!");
+  QLabel* connectUrl = new QLabel("CONNECT.COMMA.AI");
   connectUrl->setStyleSheet("font-size: 41px; font-family: Inter SemiBold; color: #A0A0A0;");
   primeLayout->addWidget(connectUrl, 0, Qt::AlignTop);
 
@@ -145,13 +145,12 @@ PrimeUserWidget::PrimeUserWidget(QWidget* parent) : QWidget(parent) {
   pointsLayout->setMargin(0);
   pointsWidget->setContentsMargins(60, 50, 60, 50);
 
-  QLabel* commaPoints = new QLabel("Please Join Our Discord.");
-  commaPoints->setStyleSheet("font-size: 50px; font-family: Inter SemiBold;");
+  QLabel* commaPoints = new QLabel("COMMA POINTS");
+  commaPoints->setStyleSheet("font-size: 41px; font-family: Inter SemiBold;");
   pointsLayout->addWidget(commaPoints, 0, Qt::AlignTop);
 
-
-  QLabel* points = new QLabel("https://discord.gg/bXGF7r8EPW");
-  points->setStyleSheet("font-size: 37px; font-weight: bold;");
+  points = new QLabel("0");
+  points->setStyleSheet("font-size: 91px; font-weight: bold;");
   pointsLayout->addWidget(points, 0, Qt::AlignTop);
 
   mainLayout->addWidget(pointsWidget);
@@ -182,12 +181,12 @@ PrimeAdWidget::PrimeAdWidget(QWidget* parent) : QFrame(parent) {
   main_layout->setContentsMargins(80, 90, 80, 60);
   main_layout->setSpacing(0);
 
-  QLabel *upgrade = new QLabel("RetroPilot is Down.");
+  QLabel *upgrade = new QLabel("Upgrade Now");
   upgrade->setStyleSheet("font-size: 75px; font-weight: bold;");
   main_layout->addWidget(upgrade, 0, Qt::AlignTop);
   main_layout->addSpacing(50);
 
-  QLabel *description = new QLabel("If you are seeing this somethings not right!");
+  QLabel *description = new QLabel("Become a comma prime member at connect.comma.ai");
   description->setStyleSheet("font-size: 60px; font-weight: light; color: white;");
   description->setWordWrap(true);
   main_layout->addWidget(description, 0, Qt::AlignTop);
@@ -199,7 +198,7 @@ PrimeAdWidget::PrimeAdWidget(QWidget* parent) : QFrame(parent) {
   main_layout->addWidget(features, 0, Qt::AlignBottom);
   main_layout->addSpacing(30);
 
-  QVector<QString> bullets = {"Not Right", "RetroPilot", "Services Down"};
+  QVector<QString> bullets = {"Remote access", "14 days of storage", "Developer perks"};
   for (auto &b: bullets) {
     const QString check = "<b><font color='#465BEA'>✓</font></b> ";
     QLabel *l = new QLabel(check + b);
@@ -234,7 +233,7 @@ SetupWidget::SetupWidget(QWidget* parent) : QFrame(parent) {
 
   finishRegistationLayout->addSpacing(30);
 
-  QLabel* registrationDescription = new QLabel("Pair your device at api.RetroPilot.org/useradmin");
+  QLabel* registrationDescription = new QLabel("Pair your device with comma connect (connect.comma.ai) and claim your comma prime offer.");
   registrationDescription->setWordWrap(true);
   registrationDescription->setStyleSheet("font-size: 55px; font-weight: light; margin-left: 55px;");
   finishRegistationLayout->addWidget(registrationDescription);

@@ -47,17 +47,18 @@ DriveStats::DriveStats(QWidget* parent) : QFrame(parent) {
   main_layout->addStretch();
   add_stats_layouts("PAST WEEK", week_);
 
-   if (auto dongleId = getDongleId()) {
-    QString url = CommaApi::BASE_URL + "/v1.1/devices/" + *dongleId + "/stats";
+  /*if (auto dongleId = getDongleId()) {
+    QString url = "https://api.commadotai.com/v1.1/devices/" + *dongleId + "/stats";
     RequestRepeater* repeater = new RequestRepeater(this, url, "ApiCache_DriveStats", 30);
     QObject::connect(repeater, &RequestRepeater::receivedResponse, this, &DriveStats::parseResponse);
-  }
+  }*/
 
   setStyleSheet(R"(
     DriveStats {
       background-color: #333333;
       border-radius: 10px;
     }
+
     QLabel[type="title"] { font-size: 51px; font-weight: 500; }
     QLabel[type="number"] { font-size: 78px; font-weight: 500; }
     QLabel[type="unit"] { font-size: 51px; font-weight: 300; color: #A0A0A0; }

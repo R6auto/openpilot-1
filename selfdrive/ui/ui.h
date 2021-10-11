@@ -17,6 +17,7 @@
 
 #define UI_FEATURE_RIGHT_CPU_TEMP 1
 #define UI_FEATURE_RIGHT_AMBIENT_TEMP 1
+#define UI_FEATURE_RIGHT_BATTERY_LEVEL 1
 #define UI_FEATURE_RIGHT_GPS_ALTITUDE 1
 #define UI_FEATURE_RIGHT_GPS_ACCURACY 1
 #define UI_FEATURE_RIGHT_GPS_SATELLITE 1
@@ -49,11 +50,6 @@
 #define COLOR_RED_ALPHA(x) nvgRGBA(201, 34, 49, x)
 #define COLOR_YELLOW nvgRGBA(218, 202, 37, 255)
 #define COLOR_RED nvgRGBA(201, 34, 49, 255)
-#define COLOR_ENGAGED_ALPHA(x) nvgRGBA(23, 134, 68, x)
-#define COLOR_WARNING nvgRGBA(218, 111, 37, 255)
-#define COLOR_WARNING_ALPHA(x) nvgRGBA(218, 111, 37, x)
-#define COLOR_ENGAGEABLE nvgRGBA(23, 51, 73, 255)
-#define COLOR_ENGAGEABLE_ALPHA(x) nvgRGBA(23, 51, 73, x)
 
 typedef cereal::CarControl::HUDControl::AudibleAlert AudibleAlert;
 
@@ -97,9 +93,6 @@ const int bdr_s = 20;
 const int header_h = 420;
 const int footer_h = 280;
 
-const int speed_sgn_r = 96;
-const int speed_sgn_touch_pad = 50;
-
 const int UI_FREQ = 20;   // Hz
 
 typedef enum UIStatus {
@@ -116,14 +109,6 @@ const QColor bg_colors [] = {
   [STATUS_ALERT] = QColor(0xC9, 0x22, 0x31, 0xf1),
 };
 
-const QColor tcs_colors [] = {
-  [int(cereal::LongitudinalPlan::VisionTurnControllerState::DISABLED)] =  QColor(0x0, 0x0, 0x0, 0xff),
-  [int(cereal::LongitudinalPlan::VisionTurnControllerState::ENTERING)] = QColor(0xC9, 0x22, 0x31, 0xf1),
-  [int(cereal::LongitudinalPlan::VisionTurnControllerState::TURNING)] = QColor(0xDA, 0x6F, 0x25, 0xf1),
-  [int(cereal::LongitudinalPlan::VisionTurnControllerState::LEAVING)
-  ] = QColor(0x17, 0x86, 0x44, 0xf1),
-};
-
 typedef struct {
   float x, y;
 } vertex_data;
@@ -137,24 +122,9 @@ typedef struct UIScene {
 
   mat3 view_from_calib;
   bool world_objects_visible;
-  bool leftBlinker, rightBlinker;
-  bool leftblindspot, rightblindspot;
-  int blinker_blinkingrate;
-  float tpmsFl, tpmsFr, tpmsRl, tpmsRr;
-  bool ui_tpms;
-
-    // Debug UI
-  bool show_debug_ui;
-
-  // Speed limit control
-  bool speed_limit_control_enabled;
-  bool speed_limit_perc_offset;
-  Rect speed_limit_sign_touch_rect;
-  double last_speed_limit_sign_tap;
 
   cereal::PandaState::PandaType pandaType;
-  cereal::CarState::Reader car_state;
-  cereal::ControlsState::Reader controls_state;
+
   // modelV2
   float lane_line_probs[4];
   float road_edge_stds[2];
@@ -195,7 +165,6 @@ typedef struct UIState {
 
   bool awake;
 
-  Rect video_rect, viz_rect;
   float car_space_transform[6];
   bool wide_camera;
 
