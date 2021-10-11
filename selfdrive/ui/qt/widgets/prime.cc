@@ -27,20 +27,12 @@ void PairingQRWidget::showEvent(QShowEvent *event) {
   refresh();
 }
 
-void PairingQRWidget::refresh(){
-  Params params;
-  QString IMEI = QString::fromStdString(params.get("IMEI"));
-  QString serial = QString::fromStdString(params.get("HardwareSerial"));
-
-  if (std::min(IMEI.length(), serial.length()) <= 5) {
-    qrCode->setText("Error getting serial: contact support");
-    qrCode->setWordWrap(true);
-    qrCode->setStyleSheet(R"(font-size: 60px;)");
-    return;
+void PairingQRWidget::refresh() {
+  if (isVisible()) {
+    QString pairToken = CommaApi::create_jwt({{"pair", true}});
+    QString qrString = "https://connect.comma.ai/?pair=" + pairToken;
+    this->updateQrCode(qrString);
   }
-  QString pairToken = CommaApi::create_jwt({{"pair", true}});
-  QString qrString = IMEI + "--" + serial + "--" + pairToken;
-  this->updateQrCode(qrString);
 }
 
 void PairingQRWidget::updateQrCode(const QString &text) {
@@ -182,6 +174,7 @@ void PrimeUserWidget::replyFinished(const QString &response) {
   }
 
   QJsonObject json = doc.object();
+  points->setText(QString::number(json["points"].toInt()));
 }
 
 PrimeAdWidget::PrimeAdWidget(QWidget* parent) : QFrame(parent) {
