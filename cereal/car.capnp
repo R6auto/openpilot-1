@@ -156,7 +156,7 @@ struct CarState {
   tpmsRl @39 :Float32;
   tpmsRr @40 :Float32;
   speedLimit @44 :Float32;
-  
+
   # car speed
   vEgo @1 :Float32;         # best estimate of speed
   aEgo @16 :Float32;        # best estimate of acceleration
@@ -217,9 +217,9 @@ struct CarState {
   rightBlindspot @34 :Bool; # Is there something blocking the right lane change
 
   cruiseGap @42 : Int32;
-  autoHold @44 : Int32;
-  tpms @45 : Tpms;
-  cluSpeedMs @46 :Float32;
+  autoHold @45 : Int32;
+  tpms @46 : Tpms;
+  cluSpeedMs @47 :Float32;
 
   struct Tpms {
     fl @0 :Float32;
