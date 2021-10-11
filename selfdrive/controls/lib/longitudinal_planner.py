@@ -10,7 +10,7 @@ from selfdrive.config import Conversions as CV
 from selfdrive.controls.lib.longcontrol import LongCtrlState
 from selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import LongitudinalMpc
 from selfdrive.controls.lib.longitudinal_mpc_lib.long_mpc import T_IDXS as T_IDXS_MPC
-from selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX, CONTROL_N
+from selfdrive.controls.lib.drive_helpers import V_CRUISE_MAX, CONTROL_N, CRUISE_CONFORT_DECEL
 from selfdrive.controls.lib.vision_turn_controller import VisionTurnController
 from selfdrive.controls.lib.speed_limit_controller import SpeedLimitController, SpeedLimitResolver
 from selfdrive.controls.lib.turn_speed_controller import TurnSpeedController
@@ -61,6 +61,7 @@ class Planner():
     self.a_desired_trajectory = np.zeros(CONTROL_N)
     self.j_desired_trajectory = np.zeros(CONTROL_N)
 
+    self.cruise_source = 'cruise'
     self.vision_turn_controller = VisionTurnController(CP)
     self.speed_limit_controller = SpeedLimitController()
     self.events = Events()
@@ -96,7 +97,8 @@ class Planner():
     self.v_desired = max(0.0, self.v_desired)
 
     # Get acceleration and active solutions for custom long mpc.
-    a_mpc, active_mpc, c_source = self.mpc_solutions(enabled, self.v_desired, self.a_desired, v_cruise, sm)
+    self.cruise_source, a_min_sol, v_cruise_sol = self.cruise_solutions(enabled, self.v_desired, self.a_desired,
+                                                                        v_cruise, sm)
 
     accel_limits = [A_CRUISE_MIN, get_max_accel(v_ego)]
     accel_limits_turns = limit_accel_in_turns(v_ego, sm['carState'].steeringAngleDeg, accel_limits, self.CP)
@@ -106,14 +108,14 @@ class Planner():
       accel_limits_turns[0] = min(accel_limits_turns[0], accel_limits_turns[1])
 
     # clip limits, cannot init MPC outside of bounds
-    accel_limits_turns[0] = min(accel_limits_turns[0], self.a_desired + 0.05)
+    accel_limits_turns[0] = min(accel_limits_turns[0], self.a_desired + 0.05, a_min_sol)
     accel_limits_turns[1] = max(accel_limits_turns[1], self.a_desired - 0.05)
     self.mpc.set_accel_limits(accel_limits_turns[0], accel_limits_turns[1])
     self.mpc.set_cur_state(self.v_desired, self.a_desired)
-    self.mpc.update(sm['carState'], sm['radarState'], v_cruise)
-    self.v_desired_trajectory = np.interp(T_IDXS[:CONTROL_N], T_IDXS_MPC, self.mpc.v_solution)
-    self.a_desired_trajectory = np.interp(T_IDXS[:CONTROL_N], T_IDXS_MPC, self.mpc.a_solution)
-    self.j_desired_trajectory = np.interp(T_IDXS[:CONTROL_N], T_IDXS_MPC[:-1], self.mpc.j_solution)
+    self.mpc.update(sm['carState'], sm['radarState'], v_cruise_sol)
+    self.v_desired_trajectory = self.mpc.v_solution[:CONTROL_N]
+    self.a_desired_trajectory = self.mpc.a_solution[:CONTROL_N]
+    self.j_desired_trajectory = self.mpc.j_solution[:CONTROL_N]
 
     #TODO counter is only needed because radar is glitchy, remove once radar is gone
     self.fcw = self.mpc.crash_cnt > 5
@@ -139,7 +141,7 @@ class Planner():
     longitudinalPlan.jerks = [float(x) for x in self.j_desired_trajectory]
 
     longitudinalPlan.hasLead = sm['radarState'].leadOne.status
-    longitudinalPlan.longitudinalPlanSource = self.mpc.source
+    longitudinalPlan.longitudinalPlanSource = self.mpc.source if self.mpc.source != 'cruise' else self.cruise_source
     longitudinalPlan.fcw = self.fcw
 
     longitudinalPlan.visionTurnControllerState = self.vision_turn_controller.state
@@ -159,39 +161,32 @@ class Planner():
 
     pm.send('longitudinalPlan', plan_send)
 
-  def mpc_solutions(self, enabled, v_ego, a_ego, v_cruise, sm):
+  def cruise_solutions(self, enabled, v_ego, a_ego, v_cruise, sm):
     # Update controllers
     self.vision_turn_controller.update(enabled, v_ego, a_ego, v_cruise, sm)
     self.events = Events()
     self.speed_limit_controller.update(enabled, v_ego, a_ego, sm, v_cruise, self.events)
-    self.turn_speed_controller.update(enabled, v_ego, a_ego, sm)
+    self.turn_speed_controller.update(enabled, v_ego, a_ego, sm, self.cruise_changed)
 
     # Pick solution with lowest acceleration target.
-    a_solutions = {None: float("inf")}
+    a_solutions = {'cruise': float("inf") if v_cruise > v_ego else CRUISE_CONFORT_DECEL}
+    v_solutions = {'cruise': v_cruise}
 
     if self.vision_turn_controller.is_active:
       a_solutions['turn'] = self.vision_turn_controller.a_target
+      v_solutions['turn'] = self.vision_turn_controller.v_turn
 
     if self.speed_limit_controller.is_active:
       a_solutions['limit'] = self.speed_limit_controller.a_target
+      v_solutions['limit'] = self.speed_limit_controller.speed_limit_offseted
 
     if self.turn_speed_controller.is_active:
       a_solutions['turnlimit'] = self.turn_speed_controller.a_target
+      v_solutions['turnlimit'] = self.turn_speed_controller.speed_limit
 
     source = min(a_solutions, key=a_solutions.get)
+    if source == 'cruise':
+      # Override cruise a_solution so that we do not affect the min acc limit when cruise is the source.
+      a_solutions[source] = float("inf")
 
-    a_sol = {
-      'cruise': a_ego,  # Irrelevant
-      'lead0': a_ego,   # Irrelevant
-      'lead1': a_ego,   # Irrelevant
-      'custom': 0. if source is None else a_solutions[source],
-    }
-
-    active_sol = {
-      'cruise': True,  # Irrelevant
-      'lead0': True,   # Irrelevant
-      'lead1': True,   # Irrelevant
-      'custom': source is not None,
-    }
-
-    return a_sol, active_sol, source
+    return source, a_solutions[source], v_solutions[source]
