@@ -1,15 +1,8 @@
 #include "selfdrive/ui/qt/offroad/settings.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-
 #include <cassert>
 #include <string>
 
-#include <iostream>       // std::cout, std::endl
-#include <thread>         // std::this_thread::sleep_for
-#include <chrono>         // std::chrono::seconds
- 
 #include <QDebug>
 
 #ifndef QCOM
@@ -75,18 +68,13 @@ TogglesPanel::TogglesPanel(QWidget *parent) : ListWidget(parent) {
 
   ParamControl *record_toggle = new ParamControl("RecordFront",
                                                  "Record and Upload Driver Camera",
-                                                "Upload data from the driver facing camera and help improve the driver monitoring algorithm.",
-                                                "../assets/offroad/icon_monitoring.png",
-                                                this);
-  toggles.append(record_toggle);
-  toggles.append(new ParamControl("EndToEndToggle",
-                                   "\U0001f96c Disable use of lanelines (Alpha) \U0001f96c",
-                                   "In this mode openpilot will ignore lanelines and just drive how it thinks a human would.",
-                                   "../assets/offroad/icon_road.png",
-                                   this));
-  toggles.append(new ParamControl("TurnVisionControl",
-                                  "Enable vision based turn control",
-                                  "Use vision path predictions to estimate the appropiate speed to drive through turns ahead.",
+                                                 "Upload data from the driver facing camera and help improve the driver monitoring algorithm.",
+                                                 "../assets/offroad/icon_monitoring.png",
+                                                 this);
+  addItem(record_toggle);
+  addItem(new ParamControl("EndToEndToggle",
+                                  "\U0001f96c Disable use of lanelines (Alpha) \U0001f96c",
+                                  "In this mode openpilot will ignore lanelines and just drive how it thinks a human would.",
                                   "../assets/offroad/icon_road.png",
                                   this));
   toggles.append(new ParamControl("SpeedLimitControl",
@@ -179,10 +167,6 @@ TogglesPanel::TogglesPanel(QWidget *parent) : ListWidget(parent) {
                                             "../assets/offroad/icon_road.png",
                                             this));
 
-                                                 "Upload data from the driver facing camera and help improve the driver monitoring algorithm.",
-                                                 "../assets/offroad/icon_monitoring.png",
-                                                 this);
-  addItem(record_toggle);
 #ifdef ENABLE_MAPS
   addItem(new ParamControl("NavSettingTime24h",
                                   "Show ETA in 24h format",

@@ -66,29 +66,11 @@ void HomeWindow::showDriverView(bool show) {
   sidebar->setVisible(show == false);
 }
 
-#ifdef QCOM2
-void HomeWindow::mouseReleaseEvent(QMouseEvent* e) {
-#else
 void HomeWindow::mousePressEvent(QMouseEvent* e) {
-  // Toggle speed limit control enabled
-  Rect touch_rect = QUIState::ui_state.scene.speed_limit_sign_touch_rect;
-  if (sidebar->isVisible()) {
-    touch_rect.x += sidebar->width();
-  }
-  SubMaster &sm = *(QUIState::ui_state.sm);
-  if (sm["longitudinalPlan"].getLongitudinalPlan().getSpeedLimit() > 0.0 &&
-      touch_rect.ptInRect(e->x(), e->y())) {
-    // If touching the speed limit sign area when visible
-    QUIState::ui_state.scene.last_speed_limit_sign_tap = seconds_since_boot();
-    QUIState::ui_state.scene.speed_limit_control_enabled = !QUIState::ui_state.scene.speed_limit_control_enabled;
-    Params().putBool("SpeedLimitControl", QUIState::ui_state.scene.speed_limit_control_enabled);
-  }
-
   // Handle sidebar collapsing
   if (onroad->isVisible() && (!sidebar->isVisible() || e->x() > sidebar->width())) {
     sidebar->setVisible(!sidebar->isVisible() && !onroad->isMapVisible());
   }
-}
 }
 
 // OffroadHome: the offroad home page
@@ -165,10 +147,10 @@ OffroadHome::OffroadHome(QWidget* parent) : QFrame(parent) {
       font-size: 55px;
     }
   )");
-  refresh();
 }
 
 void OffroadHome::showEvent(QShowEvent *event) {
+  refresh();
   timer->start(10 * 1000);
 }
 
