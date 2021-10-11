@@ -345,25 +345,6 @@ static void ui_draw_world(UIState *s) {
 }
 }
 
-static void ui_draw_vision_maxspeed(UIState *s) {
-  const int SET_SPEED_NA = 255;
-  float maxspeed = (*s->sm)["controlsState"].getControlsState().getVCruise();
-  const bool is_cruise_set = maxspeed != 0 && maxspeed != SET_SPEED_NA;
-  if (is_cruise_set && !s->scene.is_metric) { maxspeed *= 0.6225; }
-
-  const Rect rect = {bdr_s * 2, int(bdr_s * 1.5), 184, 202};
-  ui_fill_rect(s->vg, rect, COLOR_BLACK_ALPHA(100), 30.);
-  ui_draw_rect(s->vg, rect, COLOR_WHITE_ALPHA(100), 10, 20.);
-
-  nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
-  ui_draw_text(s, rect.centerX(), 118, "MAX", 26 * 2.5, COLOR_WHITE_ALPHA(is_cruise_set ? 200 : 100), "sans-regular");
-  if (is_cruise_set) {
-    const std::string maxspeed_str = std::to_string((int)std::nearbyint(maxspeed));
-    ui_draw_text(s, rect.centerX(), 212, maxspeed_str.c_str(), 48 * 2.5, COLOR_WHITE, "sans-bold");
-  } else {
-    ui_draw_text(s, rect.centerX(), 212, "N/A", 42 * 2.5, COLOR_WHITE_ALPHA(100), "sans-semibold");
-  }
-}
 static void ui_draw_vision_speedlimit(UIState *s) {
   auto longitudinal_plan = (*s->sm)["longitudinalPlan"].getLongitudinalPlan();
   const float speedLimit = longitudinal_plan.getSpeedLimit();
@@ -643,6 +624,87 @@ static void ui_draw_vision_autohold(UIState *s) {
         brake_bg, brake_img_alpha);
 }
 
+static void ui_draw_vision_maxspeed(UIState *s) {
+
+  // scc smoother
+  cereal::CarControl::SccSmoother::Reader scc_smoother = s->scene.car_control.getSccSmoother();
+  bool longControl = scc_smoother.getLongControl();
+
+  // kph
+  float applyMaxSpeed = scc_smoother.getApplyMaxSpeed();
+  float cruiseMaxSpeed = scc_smoother.getCruiseMaxSpeed();
+
+  bool is_cruise_set = (cruiseMaxSpeed > 0 && cruiseMaxSpeed < 255);
+
+  const Rect rect = {bdr_s * 2, int(bdr_s * 1.5), 184, 202};
+  ui_fill_rect(s->vg, rect, COLOR_BLACK_ALPHA(100), 30.);
+  ui_draw_rect(s->vg, rect, COLOR_WHITE_ALPHA(100), 10, 20.);
+
+  nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
+  const int text_x = rect.centerX();
+
+  if(is_cruise_set)
+  {
+    char str[256];
+
+    if(s->scene.is_metric)
+        snprintf(str, sizeof(str), "%d", (int)(applyMaxSpeed + 0.5));
+    else
+        snprintf(str, sizeof(str), "%d", (int)(applyMaxSpeed*0.621371 + 0.5));
+
+    ui_draw_text(s, text_x, 100, str, 33 * 2.5, COLOR_WHITE, "sans-semibold");
+
+    if(s->scene.is_metric)
+        snprintf(str, sizeof(str), "%d", (int)(cruiseMaxSpeed + 0.5));
+    else
+        snprintf(str, sizeof(str), "%d", (int)(cruiseMaxSpeed*0.621371 + 0.5));
+
+    ui_draw_text(s, text_x, 195, str, 48 * 2.5, COLOR_WHITE, "sans-bold");
+  }
+  else
+  {
+    if(longControl)
+        ui_draw_text(s, text_x, 100, "OP", 25 * 2.5, COLOR_WHITE_ALPHA(100), "sans-semibold");
+    else
+        ui_draw_text(s, text_x, 100, "MAX", 25 * 2.5, COLOR_WHITE_ALPHA(100), "sans-semibold");
+
+    ui_draw_text(s, text_x, 195, "N/A", 42 * 2.5, COLOR_WHITE_ALPHA(100), "sans-semibold");
+  }
+}
+
+static void ui_draw_vision_speed(UIState *s) {
+  const float speed = std::max(0.0, (*s->sm)["carState"].getCarState().getCluSpeedMs() * (s->scene.is_metric ? 3.6 : 2.2369363));
+  const std::string speed_str = std::to_string((int)std::nearbyint(speed));
+  nvgTextAlign(s->vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
+
+  if(s->fb_w > 1500) {
+    ui_draw_text(s, s->fb_w/2, 220, speed_str.c_str(), 96 * 2.5, COLOR_WHITE, "sans-bold");
+    ui_draw_text(s, s->fb_w/2, 300, s->scene.is_metric ? "km/h" : "mph", 36 * 2.5, COLOR_WHITE_ALPHA(200), "sans-regular");
+  }
+  else {
+    ui_draw_text(s, s->fb_w/2, 180, speed_str.c_str(), 60 * 2.5, COLOR_WHITE, "sans-bold");
+    ui_draw_text(s, s->fb_w/2, 230, s->scene.is_metric ? "km/h" : "mph", 25 * 2.5, COLOR_WHITE_ALPHA(200), "sans-regular");
+  }
+}
+
+static void ui_draw_vision_event(UIState *s) {
+  if (s->scene.engageable) {
+    // draw steering wheel
+    const int radius = 96;
+    const int center_x = s->fb_w - radius - bdr_s * 2;
+    const int center_y = radius  + (bdr_s * 1.5);
+    const QColor &color = bg_colors[s->status];
+    NVGcolor nvg_color = nvgRGBA(color.red(), color.green(), color.blue(), color.alpha());
+    ui_draw_circle_image(s, center_x, center_y, radius, "wheel", nvg_color, 1.0f);
+  }
+}
+
+static void ui_draw_vision_face(UIState *s) {
+  const int radius = 96;
+  const int center_x = radius + (bdr_s * 2);
+  const int center_y = s->fb_h - footer_h / 2;
+  ui_draw_circle_image(s, center_x, center_y, radius, "driver_face", s->scene.dm_active);
+}
 
 static void ui_draw_vision_header(UIState *s) {
   NVGpaint gradient = nvgLinearGradient(s->vg, 0, header_h - (header_h / 2.5), 0, header_h,

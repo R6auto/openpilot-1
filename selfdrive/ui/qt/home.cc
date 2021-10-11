@@ -66,6 +66,9 @@ void HomeWindow::showDriverView(bool show) {
   sidebar->setVisible(show == false);
 }
 
+#ifdef QCOM2
+void HomeWindow::mouseReleaseEvent(QMouseEvent* e) {
+#else
 void HomeWindow::mousePressEvent(QMouseEvent* e) {
   // Toggle speed limit control enabled
   Rect touch_rect = QUIState::ui_state.scene.speed_limit_sign_touch_rect;
