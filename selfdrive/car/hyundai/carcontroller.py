@@ -84,19 +84,8 @@ class CarController():
 
     self.steer_rate_limited = new_steer != apply_steer
 
-         #Control type changer - JPR
-    if CS.lkas_button_on != CS.prev_lkas_button:
-      if self.cnt == 0:
-        self.cnt = 1
-      else:
-        self.cnt = 0
-
-    if self.cnt == 0: # Lat and Long
-      # disable if steer angle reach 90 deg, otherwise mdps fault in some models
-      lkas_active = enabled and not CS.out.steerWarning and abs(CS.out.steeringAngleDeg) < CS.CP.maxSteeringAngleDeg
-    if self.cnt == 1: # Long only
-      lkas_active = False
-
+    # disable if steer angle reach 90 deg, otherwise mdps fault in some models
+    lkas_active = enabled and not CS.out.steerWarning and abs(CS.out.steeringAngleDeg) < CS.CP.maxSteeringAngleDeg
 
     UseSMDPS = Params().get_bool('UseSMDPSHarness')
 
