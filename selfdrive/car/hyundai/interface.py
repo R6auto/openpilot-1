@@ -607,6 +607,11 @@ class CarInterface(CarInterfaceBase):
     if self.mad_mode_enabled and EventName.pedalPressed in events.events:
       events.events.remove(EventName.pedalPressed)
 
+    if self.CS.lkas_button_on != self.CS.prev_lkas_button and self.CC.cnt == 0:
+      events.add(EventName.normalcontrol)
+    elif self.CS.lkas_button_on != self.CS.prev_lkas_button:
+      events.add(EventName.longcontrol)
+
   # handle button presses
     for b in ret.buttonEvents:
       # do disable on button down
