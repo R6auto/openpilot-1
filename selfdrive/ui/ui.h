@@ -35,6 +35,7 @@
 #define COLOR_WARNING_ALPHA(x) nvgRGBA(218, 111, 37, x)
 #define COLOR_ENGAGEABLE nvgRGBA(23, 51, 73, 255)
 #define COLOR_ENGAGEABLE_ALPHA(x) nvgRGBA(23, 51, 73, x)
+#define UI_FEATURE_DASHCAM 1
 
 typedef cereal::CarControl::HUDControl::AudibleAlert AudibleAlert;
 
