@@ -89,8 +89,8 @@ typedef enum UIStatus {
 
 const QColor bg_colors [] = {
   [STATUS_DISENGAGED] =  QColor(0x17, 0x33, 0x49, 0xc8),
-  [STATUS_ENGAGED] = QColor(0x17, 0x86, 0x44, 0xf1),
-  [STATUS_WARNING] = QColor(0xDA, 0x6F, 0x25, 0xf1),
+  [STATUS_ENGAGED] = QColor(0x17, 0x86, 0x44, 0x01),
+  [STATUS_WARNING] = QColor(0xDA, 0x6F, 0x25, 0x01),
   [STATUS_ALERT] = QColor(0xC9, 0x22, 0x31, 0xf1),
 };
 
@@ -107,6 +107,11 @@ typedef struct UIScene {
 
   mat3 view_from_calib;
   bool world_objects_visible;
+
+  // ui add
+  float cpuTempAvg;
+  bool leftBlinker, rightBlinker;
+  int blinkingrate;
 
   cereal::PandaState::PandaType pandaType;
 
@@ -129,6 +134,9 @@ typedef struct UIScene {
 
   // neokii dev UI
   cereal::CarControl::Reader car_control;
+  cereal::CarState::Reader car_state;
+  cereal::DeviceState::Reader deviceState;
+  cereal::ControlsState::Reader controls_state;
   cereal::CarParams::Reader car_params;
   cereal::GpsLocationData::Reader gps_ext;
   cereal::LiveParametersData::Reader live_params;
