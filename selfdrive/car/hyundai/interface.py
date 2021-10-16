@@ -67,14 +67,10 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.lqr.k = [-110., 451.]
       ret.lateralTuning.lqr.l = [0.33, 0.318]
 
-    if not Params().get_bool('UseLQR'):
-      ret.steerActuatorDelay = 0.2
-    else:
-      ret.steerActuatorDelay = 0.1
-
-    tire_stiffness_factor = 1.
+    ret.steerRatio = 16.5
+    ret.steerActuatorDelay = 0.1
     ret.steerLimitTimer = 2.5
-    ret.steerRateCost = 0.5
+    ret.steerRateCost = 0.4
     ret.steerMaxBP = [0.]
     ret.steerMaxV = [1.5]
 
@@ -105,8 +101,8 @@ class CarInterface(CarInterfaceBase):
 
     ret.startAccel = -0.4
     ret.stopAccel = -2.0
-    ret.startingAccelRate = 4.0  # brake_travel/s while releasing on restart
-    ret.stoppingDecelRate = 1.0  # brake_travel/s while trying to stop
+    ret.startingAccelRate = 5.0  # brake_travel/s while releasing on restart
+    ret.stoppingDecelRate = 0.5  # brake_travel/s while trying to stop
     ret.vEgoStopping = 0.6
     ret.vEgoStarting = 0.5
 
@@ -119,7 +115,7 @@ class CarInterface(CarInterfaceBase):
       ret.minSteerSpeed = 37 * CV.MPH_TO_MS
       ret.steerRatio = 16.5
       tire_stiffness_factor = 0.85
-
+      ret.maxSteeringAngleDeg = 90.
     elif candidate == CAR.GENESIS_G70:
       os.system("cd /data/openpilot/selfdrive/assets && rm -rf img_spinner_comma.png && cp Genesis.png img_spinner_comma.png")
       if not UseLQR:
