@@ -76,21 +76,6 @@ TogglesPanel::TogglesPanel(QWidget *parent) : ListWidget(parent) {
                                   "In this mode openpilot will ignore lanelines and just drive how it thinks a human would.",
                                   "../assets/offroad/icon_road.png",
                                   this));
-  addItem(new ParamControl("ShowDebugUI",
-                                  "Show debug UI elements",
-                                  "Show UI elements that aid debugging.",
-                                  "../assets/offroad/icon_calibration.png",
-                                  this));
-  addItem(new ParamControl("PutPrebuilt",
-                                            "Prebuilt Enable",
-                                            "Create prebuilt files to speed up load time.",
-                                            "../assets/offroad/icon_road.png",
-                                            this));
-  addItem(new ParamControl("AR",
-                                            "Enable Auto Record",
-                                            "Starts recording on car start and stops on car off.",
-                                            "../assets/offroad/icon_road.png",
-                                            this));
   addItem(new ParamControl("LoggerEnabled",
                                             "Enable Logger / Uploader",
                                             "This causes slow frame time on weak hardware.",
@@ -107,8 +92,8 @@ TogglesPanel::TogglesPanel(QWidget *parent) : ListWidget(parent) {
                                             "../assets/offroad/icon_road.png",
                                             this));
   addItem(new ParamControl("LowSpeedAlerts",
-                                            "Enable TPMS Alerts",
-                                            "Enables Tire Pressure Monitoring System Alerts for Low Tire Pressure.",
+                                            "Enable Low Speed Alerts",
+                                            "Enables Low Speed alerts for cars with min steer speeds.",
                                             "../assets/offroad/icon_road.png",
                                             this));
   addItem(new ParamControl("SSCOD",
