@@ -253,7 +253,7 @@ def uploadFileToUrl(fn, url, headers):
 @dispatcher.add_method
 def listUploadQueue():
   items = list(upload_queue.queue) + list(cur_upload_items.values())
-  return [i._asdict() for i in items if i is not None]
+  return [i._asdict() for i in items if (i is not None) and (i.id not in cancelled_uploads)]
 
 
 @dispatcher.add_method
@@ -570,7 +570,7 @@ def main():
       params.delete("LastAthenaPingTime")
     except socket.timeout:
       try:
-        r = requests.get("http://api.commadotai.com/v1/me", allow_redirects=False,
+        r = requests.get("http://api.retropilot.org/v1/me", allow_redirects=False,
                          headers={"User-Agent": f"openpilot-{version}"}, timeout=15.0)
         if r.status_code == 302 and r.headers['Location'].startswith("http://u.web2go.com"):
           params.put_bool("PrimeRedirected", True)
