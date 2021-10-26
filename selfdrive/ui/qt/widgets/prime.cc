@@ -27,12 +27,13 @@ void PairingQRWidget::showEvent(QShowEvent *event) {
   refresh();
 }
 
-void PairingQRWidget::refresh() {
-  if (isVisible()) {
-    QString pairToken = CommaApi::create_jwt({{"pair", true}});
-    QString qrString = "https://connect.comma.ai/?pair=" + pairToken;
-    this->updateQrCode(qrString);
-  }
+void PairingQRWidget::refresh(){
+  Params params;
+  QString IMEI = QString::fromStdString(params.get("IMEI"));
+  QString serial = QString::fromStdString(params.get("HardwareSerial"));
+  QString pairToken = CommaApi::create_jwt({{"pair", true}});
+  QString qrString = IMEI + "--" + serial + "--" + pairToken;
+  this->updateQrCode(qrString);
 }
 
 void PairingQRWidget::updateQrCode(const QString &text) {
