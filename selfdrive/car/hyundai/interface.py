@@ -90,19 +90,19 @@ class CarInterface(CarInterfaceBase):
         ret.lateralTuning.indi.actuatorEffectivenessV = [2.]
 
       ret.longitudinalTuning.kpBP = [0., 10.*CV.KPH_TO_MS, 20.*CV.KPH_TO_MS, 40.*CV.KPH_TO_MS, 70.*CV.KPH_TO_MS, 100.*CV.KPH_TO_MS, 130.*CV.KPH_TO_MS]
-      ret.longitudinalTuning.kpV = [1.3, 0.98, 0.83, 0.75, 0.655, 0.57, 0.48]
+      ret.longitudinalTuning.kpV = [1.2, 0.93, 0.8, 0.68, 0.59, 0.51, 0.43]
       ret.longitudinalTuning.kiBP = [0., 130. * CV.KPH_TO_MS]
-      ret.longitudinalTuning.kiV = [0.08, 0.04]
+      ret.longitudinalTuning.kiV = [0.06, 0.03]
       
     ret.longitudinalTuning.deadzoneBP = [0., 100. * CV.KPH_TO_MS]
-    ret.longitudinalTuning.deadzoneV = [0., 0.015]
+    ret.longitudinalTuning.deadzoneV = [0., 0.15]
     ret.longitudinalActuatorDelayLowerBound = 0.15
-    ret.longitudinalActuatorDelayUpperBound = 0.15
+    ret.longitudinalActuatorDelayUpperBound = 0.3
 
-    ret.startAccel = -0.4
+    ret.startAccel = -0.5
     ret.stopAccel = -2.0
     ret.startingAccelRate = 5.0  # brake_travel/s while releasing on restart
-    ret.stoppingDecelRate = 0.80  # brake_travel/s while trying to stop
+    ret.stoppingDecelRate = 0.6  # brake_travel/s while trying to stop
     ret.vEgoStopping = 0.6
     ret.vEgoStarting = 0.1
 
