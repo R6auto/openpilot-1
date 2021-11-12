@@ -11,7 +11,7 @@ RADAR_START_ADDR = 0x500
 RADAR_MSG_COUNT = 32
 def get_radar_can_parser(CP):
 
-  if Params().get_bool("NewRadarInterface"):
+  if False: #Params().get_bool("NewRadarInterface"):
 
     signals = []
     checks = []
@@ -46,7 +46,7 @@ def get_radar_can_parser(CP):
 class RadarInterface(RadarInterfaceBase):
   def __init__(self, CP):
     super().__init__(CP)
-    self.new_radar = Params().get_bool("NewRadarInterface")
+    self.new_radar = False #Params().get_bool("NewRadarInterface")
     self.updated_messages = set()
     self.trigger_msg = 0x420 if not self.new_radar else RADAR_START_ADDR + RADAR_MSG_COUNT - 1
     self.track_id = 0
@@ -118,7 +118,7 @@ class RadarInterface(RadarInterfaceBase):
             self.pts[ii].trackId = self.track_id
             self.track_id += 1
 
-          self.pts[ii].dRel = cpt["SCC11"]['ACC_ObjDist'] # from front of car
+          self.pts[ii].dRel = cpt["SCC11"]['ACC_ObjDist']  # from front of car
           self.pts[ii].yRel = -cpt["SCC11"]['ACC_ObjLatPos']  # in car frame's y axis, left is negative
           self.pts[ii].vRel = cpt["SCC11"]['ACC_ObjRelSpd']
           self.pts[ii].aRel = float('nan')

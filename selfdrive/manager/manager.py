@@ -52,7 +52,7 @@ def manager_init():
     ("SccSmootherSyncGasPressed", "0"),
     ("StockNaviDecelEnabled", "0"),
     ("ShowDebugUI", "0"),
-    ("UseSMDPSHarness", "0"),
+
     ("SSCOD", "0"),
     ("DisableUpdates", "0"),
     ("LoggerEnabled", "0"),

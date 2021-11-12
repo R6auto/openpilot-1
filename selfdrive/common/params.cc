@@ -178,7 +178,6 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"StockNaviDecelEnabled", PERSISTENT},
     {"ShowDebugUI", PERSISTENT},
     {"CustomLeadMark", PERSISTENT},
-    {"UseSMDPSHarness", PERSISTENT},
     {"SSCOD", PERSISTENT},
     {"LoggerEnabled", PERSISTENT},
     {"CleanUI", PERSISTENT},

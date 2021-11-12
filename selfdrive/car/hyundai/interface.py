@@ -45,12 +45,8 @@ class CarInterface(CarInterfaceBase):
 
     ret.communityFeature = True
 
-    eps_modified = False
-    for fw in car_fw:
-      if fw.ecu == "eps" and b"," in fw.fwVersion:
-        eps_modified = True
-
-    ret.maxSteeringAngleDeg = 90.
+    tire_stiffness_factor = 1.
+    ret.maxSteeringAngleDeg = 1000.
     UseLQR = Params().get_bool('UseLQR')
 
     # lateral LQR global hyundai
@@ -91,7 +87,7 @@ class CarInterface(CarInterfaceBase):
 
       ret.longitudinalTuning.kpBP = [0., 10.*CV.KPH_TO_MS, 20.*CV.KPH_TO_MS, 40.*CV.KPH_TO_MS, 70.*CV.KPH_TO_MS, 100.*CV.KPH_TO_MS, 130.*CV.KPH_TO_MS]
       ret.longitudinalTuning.kpV = [1.2, 0.93, 0.8, 0.68, 0.59, 0.51, 0.43]
-   	  ret.longitudinalTuning.kiBP = [0., 130. * CV.KPH_TO_MS]
+      ret.longitudinalTuning.kiBP = [0., 130. * CV.KPH_TO_MS]
       ret.longitudinalTuning.kiV = [0.06, 0.03]
 	
     ret.longitudinalTuning.deadzoneBP = [0., 30.*CV.KPH_TO_MS]
@@ -160,7 +156,7 @@ class CarInterface(CarInterfaceBase):
       tire_stiffness_factor = 0.85
       ret.longitudinalTuning.kpBP = [0., 10.*CV.KPH_TO_MS, 20.*CV.KPH_TO_MS, 40.*CV.KPH_TO_MS, 70.*CV.KPH_TO_MS, 100.*CV.KPH_TO_MS, 130.*CV.KPH_TO_MS]
       ret.longitudinalTuning.kpV = [1.2, 0.93, 0.8, 0.68, 0.59, 0.51, 0.43]
-   	  ret.longitudinalTuning.kiBP = [0., 130. * CV.KPH_TO_MS]
+      ret.longitudinalTuning.kiBP = [0., 130. * CV.KPH_TO_MS]
       ret.longitudinalTuning.kiV = [0.06, 0.03]
 
     elif candidate == CAR.GENESIS_EQ900:
@@ -181,7 +177,7 @@ class CarInterface(CarInterfaceBase):
         ret.lateralTuning.indi.actuatorEffectivenessV = [2.]
       ret.longitudinalTuning.kpBP = [0., 10.*CV.KPH_TO_MS, 20.*CV.KPH_TO_MS, 40.*CV.KPH_TO_MS, 70.*CV.KPH_TO_MS, 100.*CV.KPH_TO_MS, 130.*CV.KPH_TO_MS]
       ret.longitudinalTuning.kpV = [1.2, 0.93, 0.8, 0.68, 0.59, 0.51, 0.43]
-   	  ret.longitudinalTuning.kiBP = [0., 130. * CV.KPH_TO_MS]
+      ret.longitudinalTuning.kiBP = [0., 130. * CV.KPH_TO_MS]
       ret.longitudinalTuning.kiV = [0.06, 0.03]
 
     elif candidate == CAR.GENESIS_EQ900_L:
@@ -211,9 +207,8 @@ class CarInterface(CarInterfaceBase):
 
       ret.longitudinalTuning.kpBP = [0., 10.*CV.KPH_TO_MS, 20.*CV.KPH_TO_MS, 40.*CV.KPH_TO_MS, 70.*CV.KPH_TO_MS, 100.*CV.KPH_TO_MS, 130.*CV.KPH_TO_MS]
       ret.longitudinalTuning.kpV = [1.2, 0.93, 0.8, 0.68, 0.59, 0.51, 0.43]
-   	  ret.longitudinalTuning.kiBP = [0., 130. * CV.KPH_TO_MS]
+      ret.longitudinalTuning.kiBP = [0., 130. * CV.KPH_TO_MS]
       ret.longitudinalTuning.kiV = [0.06, 0.03]
-
 
     # hyundai
     elif candidate in [CAR.SANTA_FE]:
@@ -336,7 +331,7 @@ class CarInterface(CarInterfaceBase):
       if candidate not in [CAR.IONIQ_EV_2020, CAR.IONIQ_PHEV]:
         ret.minSteerSpeed = 32 * CV.MPH_TO_MS
       ret.centerToFront = ret.wheelbase * 0.4
-      if candidate not in [CAR.IONIQ_EV_2020, CAR.IONIQ_PHEV] and not Params().get_bool('UseSMDPSHarness'):
+      if candidate not in [CAR.IONIQ_EV_2020, CAR.IONIQ_PHEV]:
         ret.minSteerSpeed = 32 * CV.MPH_TO_MS
     elif candidate in [CAR.GRANDEUR_IG, CAR.GRANDEUR_IG_HEV]:
       os.system("cd /data/openpilot/selfdrive/assets && rm -rf img_spinner_comma.png && cp Hyundai.png img_spinner_comma.png")
@@ -433,7 +428,7 @@ class CarInterface(CarInterfaceBase):
       ret.steerRatio = 13.73  # Spec
       tire_stiffness_factor = 0.7
       ret.centerToFront = ret.wheelbase * 0.4
-      if candidate == CAR.NIRO_HEV and not Params().get_bool('UseSMDPSHarness'):
+      if candidate == CAR.NIRO_HEV:
         ret.minSteerSpeed = 32 * CV.MPH_TO_MS
     elif candidate in [CAR.K7, CAR.K7_HEV]:
       os.system("cd /data/openpilot/selfdrive/assets && rm -rf img_spinner_comma.png && cp Kia.png img_spinner_comma.png")
@@ -558,7 +553,7 @@ class CarInterface(CarInterfaceBase):
       events.add(EventName.brakeUnavailable)
     if abs(ret.steeringAngleDeg) > self.CP.maxSteeringAngleDeg and EventName.steerSaturated not in events.events:
       events.add(EventName.steerSaturated)
-    if self.low_speed_alert and not self.CS.mdps_bus:
+    if self.low_speed_alert and not self.CS.mdps_bus and Params().get_bool("LowSpeedAlerts"):
       events.add(EventName.belowSteerSpeed)
     if self.CC.turning_indicator_alert:
       events.add(EventName.turningIndicatorOn)
