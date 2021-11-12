@@ -589,7 +589,11 @@ CommunityPanel::CommunityPanel(QWidget* parent) : QWidget(parent) {
                                             "warnings: it is beta, be careful!! Openpilot will control the speed of your car",
                                             "../assets/offroad/icon_road.png",
                                             this));
-
+  toggles.append(new ParamControl("ShowDebugUI",
+                                            "Show Debug UI",
+                                            "",
+                                            "../assets/offroad/icon_shell.png",
+                                            this));
   toggles.append(new ParamControl("IsLdwsCar",
                                             "LDWS",
                                             "If your car only supports LDWS, turn it on.",
