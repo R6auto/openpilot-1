@@ -145,13 +145,6 @@ class CarState(CarStateBase):
       ret.gas = cp.vl["EMS12"]["PV_AV_CAN"] / 100.
       ret.gasPressed = bool(cp.vl["EMS16"]["CF_Ems_AclAct"])
 
-    #Parking Sensors - JPR
-    #ret.ParkFrontRight = cp.vl["PAS11"]["CF_Gway_PASDisplayFLH"]
-    #ret.ParkFrontLeft = cp.vl["PAS11"]["CF_Gway_PASDisplayFLH"]
-    #ret.ParkRearRight = cp.vl["PAS11"]["CF_Gway_PASDisplayFLH"]
-    #ret.ParkRearLeft = cp.vl["PAS11"]["CF_Gway_PASDisplayFLH"]
-
-
     # TODO: refactor gear parsing in function
     # Gear Selection via Cluster - For those Kia/Hyundai which are not fully discovered, we can use the Cluster Indicator for Gear Selection,
     # as this seems to be standard over all cars, but is not the preferred method.
@@ -219,7 +212,6 @@ class CarState(CarStateBase):
 
   @staticmethod
   def get_can_parser(CP):
-    
 
     signals = [
       # sig_name, sig_address, default
@@ -458,6 +450,7 @@ class CarState(CarStateBase):
       checks += [
         ("MDPS12", 50)
       ]
+
     if CP.sasBus == 1:
       signals += [
         ("SAS_Angle", "SAS11", 0),
