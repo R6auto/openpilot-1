@@ -86,24 +86,6 @@ class CarController():
     # disable if steer angle reach 90 deg, otherwise mdps fault in some models
     lkas_active = enabled and not CS.out.steerWarning and abs(CS.out.steeringAngleDeg) < CS.CP.maxSteeringAngleDeg
 
-    UseSMDPS = Params().get_bool('UseSMDPSHarness')
-
-    min_set_speed = 30 * CV.KPH_TO_MS
-    # fix for Genesis hard fault at low speed
-	  # Use SMDPS and Min Steer Speed limits - JPR
-    if UseSMDPS == True:
-      min_set_speed = 0 * CV.KPH_TO_MS
-    else:
-      if CS.out.vEgo < 55 * CV.KPH_TO_MS and self.car_fingerprint == CAR.GENESIS and not CS.mdps_bus:
-        lkas_active = False
-        min_set_speed = 55 * CV.KPH_TO_MS
-      if CS.out.vEgo < 16.09 * CV.KPH_TO_MS and self.car_fingerprint == CAR.NIRO_HEV and not CS.mdps_bus:
-        lkas_active = False
-        min_set_speed = 16.09 * CV.KPH_TO_MS
-      if CS.out.vEgo < 30 * CV.KPH_TO_MS and self.car_fingerprint == CAR.ELANTRA and not CS.mdps_bus:
-        lkas_active = False
-        min_set_speed = 30 * CV.KPH_TO_MS
-
     # Disable steering while turning blinker on and speed below 60 kph
     if CS.out.leftBlinker or CS.out.rightBlinker:
       self.turning_signal_timer = 0.5 / DT_CTRL  # Disable for 0.5 Seconds after blinker turned off
