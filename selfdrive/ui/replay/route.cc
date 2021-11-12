@@ -40,7 +40,7 @@ bool Route::loadFromServer() {
   QObject::connect(&http, &HttpRequest::receivedResponse, [&](const QString &json) {
     loop.exit(loadFromJson(json));
   });
-  http.sendRequest("https://api.commadotai.com/v1/route/" + route_.str + "/files");
+  http.sendRequest("https://api.retropilot.org/v1/route/" + route_.str + "/files");
   return loop.exec();
 }
 
