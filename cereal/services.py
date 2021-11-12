@@ -33,7 +33,7 @@ services = {
   "radarState": (True, 20., 5),
   "roadEncodeIdx": (True, 20., 1),
   "liveTracks": (True, 20.),
-  "sendcan": (True, 100.),
+  "sendcan": (True, 100., 139),
   "logMessage": (True, 0.),
   "liveCalibration": (True, 4., 4),
   "androidLog": (True, 0.),
@@ -63,6 +63,8 @@ services = {
   "managerState": (True, 2., 1),
   "uploaderState": (True, 0., 1),
   "liveMapData": (True, 0.),
+  "navInstruction": (True, 0.),
+  "navRoute": (True, 0.),
 
   # debug
   "testJoystick": (False, 0.),

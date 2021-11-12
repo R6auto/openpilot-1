@@ -97,7 +97,7 @@ class LateralPlanner():
 
       self.t_idxs = np.array(md.position.t)
       self.plan_yaw = list(md.orientation.z)
-    if len(md.orientation.xStd) == TRAJECTORY_SIZE:
+    if len(md.position.xStd) == TRAJECTORY_SIZE:
       self.path_xyz_stds = np.column_stack([md.position.xStd, md.position.yStd, md.position.zStd])
 
     # Lane change logic
@@ -246,6 +246,7 @@ class LateralPlanner():
     plan_send.lateralPlan.mpcSolutionValid = bool(plan_solution_valid)
 
     plan_send.lateralPlan.desire = self.desire
+    plan_send.lateralPlan.useLaneLines = self.use_lanelines
     plan_send.lateralPlan.laneChangeState = self.lane_change_state
     plan_send.lateralPlan.laneChangeDirection = self.lane_change_direction
     plan_send.lateralPlan.autoLaneChangeEnabled = self.auto_lane_change_enabled

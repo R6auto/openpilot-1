@@ -289,14 +289,10 @@ struct DeviceState @0xa4d8b5af2aa492eb {
   networkType @22 :NetworkType;
   networkInfo @31 :NetworkInfo;
   networkStrength @24 :NetworkStrength;
-  offroadPowerUsageUwh @23 :UInt32;
-  carBatteryCapacityUwh @25 :UInt32;
+  lastAthenaPingTime @32 :UInt64;
 
-  fanSpeedPercentDesired @10 :UInt16;
   started @11 :Bool;
   startedMonoTime @13 :UInt64;
-
-  lastAthenaPingTime @32 :UInt64;
 
   # system utilization
   freeSpacePercent @7 :Float32;
@@ -309,6 +305,8 @@ struct DeviceState @0xa4d8b5af2aa492eb {
   batteryCurrent @15 :Int32;
   chargingError @17 :Bool;
   chargingDisabled @18 :Bool;
+  offroadPowerUsageUwh @23 :UInt32;
+  carBatteryCapacityUwh @25 :UInt32;
 
   # device thermals
   cpuTempC @26 :List(Float32);
@@ -318,8 +316,11 @@ struct DeviceState @0xa4d8b5af2aa492eb {
   nvmeTempC @35 :List(Float32);
   modemTempC @36 :List(Float32);
   thermalStatus @14 :ThermalStatus;
+
+  fanSpeedPercentDesired @10 :UInt16;
+  screenBrightnessPercent @37 :Int8;
   
-  wifiIpAddress @37 :Text;
+  wifiIpAddress @38 :Text;
 
   enum ThermalStatus {
     green @0;
@@ -705,6 +706,7 @@ struct ModelDataV2 {
   orientation @5 :XYZTData;
   velocity @6 :XYZTData;
   orientationRate @7 :XYZTData;
+  acceleration @19 :XYZTData;
 
   # prediction lanelines and road edges
   laneLines @8 :List(XYZTData);
@@ -910,22 +912,22 @@ struct LateralPlan @0xe1e9318e2ae8b51e {
   rProb @7 :Float32;
   dPathPoints @20 :List(Float32);
   dProb @21 :Float32;
-  dPathWLinesX @29 :List(Float32);
-  dPathWLinesY @30 :List(Float32);
+  dPathWLinesX @32 :List(Float32);
+  dPathWLinesY @33 :List(Float32);
 
   mpcSolutionValid @9 :Bool;
   desire @17 :Desire;
   laneChangeState @18 :LaneChangeState;
   laneChangeDirection @19 :LaneChangeDirection;
-
+  useLaneLines @29 :Bool;
 
   # desired curvatures over next 2.5s in rad/m
   psis @26 :List(Float32);
   curvatures @27 :List(Float32);
   curvatureRates @28 :List(Float32);
   
-  autoLaneChangeEnabled @31 :Bool;
-  autoLaneChangeTimer @32 :Int8;
+  autoLaneChangeEnabled @30 :Bool;
+  autoLaneChangeTimer @31 :Int8;
 
   enum Desire {
     none @0;
@@ -1309,6 +1311,7 @@ struct DriverState {
   distractedEyes @20 :Float32;
   eyesOnRoad @21 :Float32;
   phoneUse @22 :Float32;
+  occludedProb @23 :Float32;
 
   irPwrDEPRECATED @10 :Float32;
   descriptorDEPRECATED @1 :List(Float32);
@@ -1449,6 +1452,44 @@ struct UploaderState {
   lastFilename @6 :Text;
 }
 
+struct NavInstruction {
+  maneuverPrimaryText @0 :Text;
+  maneuverSecondaryText @1 :Text;
+  maneuverDistance @2 :Float32;  # m
+  maneuverType @3 :Text; # TODO: Make Enum
+  maneuverModifier @4 :Text; # TODO: Make Enum
+
+  distanceRemaining @5 :Float32; # m
+  timeRemaining @6 :Float32; # s
+  timeRemainingTypical @7 :Float32; # s
+
+  lanes @8 :List(Lane);
+  showFull @9 :Bool;
+
+  struct Lane {
+    directions @0 :List(Direction);
+    active @1 :Bool;
+    activeDirection @2 :Direction;
+  }
+
+  enum Direction {
+    none @0;
+    left @1;
+    right @2;
+    straight @3;
+  }
+
+}
+
+struct NavRoute {
+  coordinates @0 :List(Coordinate);
+
+  struct Coordinate {
+    latitude @0 :Float32;
+    longitude @1 :Float32;
+  }
+}
+
 struct RoadLimitSpeed {
     active @0 :UInt16;
     roadLimitSpeed @1 :UInt16;
@@ -1500,7 +1541,7 @@ struct Event {
     driverMonitoringState @71: DriverMonitoringState;
     liveLocationKalman @72 :LiveLocationKalman;
     modelV2 @75 :ModelDataV2;
-    liveMapData @82: LiveMapData;
+    liveMapData @85: LiveMapData;
 
     # camera stuff, each camera state has a matching encode idx
     roadCameraState @2 :FrameData;
@@ -1519,8 +1560,12 @@ struct Event {
     deviceState @6 :DeviceState;
     logMessage @18 :Text;
 
+    # navigation
+    navInstruction @82 :NavInstruction;
+    navRoute @83 :NavRoute;
+    
     # neokii
-    roadLimitSpeed @83 :RoadLimitSpeed;
+    roadLimitSpeed @84 :RoadLimitSpeed;
 
     # *********** debug ***********
     testJoystick @52 :Joystick;

@@ -67,6 +67,7 @@ def manager_init():
     ("PutPrebuilt", "0"),
     ("StockNaviDecelEnabled", "0"),
     ("ShowDebugUI", "0"),
+    ("DisableOpFcw", "0"),
     ("CustomLeadMark", "0"),
     ("HyundaiNaviSL", "0"),
     ("LowSpeedAlerts", "1"),

@@ -170,6 +170,7 @@ struct CarState {
   # brake pedal, 0.0-1.0
   brake @5 :Float32;      # this is user pedal only
   brakePressed @6 :Bool;  # this is user pedal only
+  brakeHoldActive @38 :Bool;
 
   # steering wheel
   steeringAngleDeg @7 :Float32;
@@ -402,11 +403,11 @@ struct CarControl {
       chimeEngage @1;
       chimeDisengage @2;
       chimeError @3;
-      chimeWarning1 @4;
-      chimeWarning2 @5;
-      chimeWarningRepeat @6;
+      chimeWarning1 @4; # unused
+      chimeWarningRepeat @5;
+      chimeWarningRepeatInfinite @6;
       chimePrompt @7;
-      chimeWarning2Repeat @8;
+      chimeWarning2RepeatInfinite @8;
       chimeSlowingDownSpeed @9;
     }
   }
@@ -490,7 +491,7 @@ struct CarParams {
   communityFeature @46: Bool;  # true if a community maintained feature is detected
   fingerprintSource @49: FingerprintSource;
   networkLocation @50 :NetworkLocation;  # Where Panda/C2 is integrated into the car's CAN network
-  
+
   struct SafetyConfig {
     safetyModel @0 :SafetyModel;
     safetyParam @1 :Int16;
