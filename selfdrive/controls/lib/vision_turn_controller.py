@@ -26,10 +26,12 @@ _EVAL_RANGE = np.arange(_EVAL_START, _EVAL_LENGHT, _EVAL_STEP)
 
 _A_LAT_REG_MAX = 2.  # Maximum lateral acceleration
 
+_NO_OVERSHOOT_TIME_HORIZON = 4.  # s. Time to use for velocity desired based on a_target when not overshooting.
+
 # Lookup table for the minimum smooth deceleration during the ENTERING state
 # depending on the actual maximum absolute lateral acceleration predicted on the turn ahead.
 _ENTERING_SMOOTH_DECEL_V = [-0.2, -1.]  # min decel value allowed on ENTERING state
-_ENTERING_SMOOTH_DECEL_BP = [1.3, 3]  # absolute value of lat acc ahead
+_ENTERING_SMOOTH_DECEL_BP = [1.3, 3.]  # absolute value of lat acc ahead
 
 # Lookup table for the acceleration for the TURNING state
 # depending on the current lateral acceleration of the vehicle.
@@ -124,7 +126,10 @@ class VisionTurnController():
 
   @property
   def v_turn(self):
-    return self._v_overshoot if self.is_active and self._lat_acc_overshoot_ahead else self._v_ego
+    if not self.is_active:
+      return self._v_cruise_setpoint
+    return self._v_overshoot if self._lat_acc_overshoot_ahead \
+      else self._v_ego + self._a_target * _NO_OVERSHOOT_TIME_HORIZON
 
   @property
   def is_active(self):

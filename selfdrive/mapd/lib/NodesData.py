@@ -292,7 +292,7 @@ class NodesData:
 
     # Build route divertion options data from the wr_index.
     wr_ids = [wr.id for wr in way_relations]
-    self._divertions = [[wr for wr in wr_index.get(node_id, [])
+    self._divertions = [[wr for wr in wr_index.way_relations_with_edge_node_id(node_id)
                         if is_wr_a_valid_divertion_from_node(wr, node_id, wr_ids)]
                         for node_id in nodes_data[:, 0]]
 
@@ -382,3 +382,16 @@ class NodesData:
     valid_divertions = [self._divertions[i] for i in valid_idxs]
 
     return [wr for wrs in valid_divertions for wr in wrs]  # flatten.
+
+  def distance_to_node(self, node_id, ahead_idx, distance_to_node_ahead):
+    """
+    Provides the distance to a specific node in the route identified by `node_id` in reference to the node ahead
+    (`ahead_idx`) and the distance from current location to the node ahead (`distance_to_node_ahead`).
+    """
+    node_ids = self.get(NodeDataIdx.node_id)
+    node_idxs = np.nonzero(node_ids == node_id)[0]
+    if len(self._nodes_data) == 0 or ahead_idx is None or len(node_idxs) == 0:
+      return None
+
+    return self.get(NodeDataIdx.dist_route)[node_idxs[0]] - self.get(NodeDataIdx.dist_route)[ahead_idx] + \
+      distance_to_node_ahead

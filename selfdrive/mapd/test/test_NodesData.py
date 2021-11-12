@@ -320,4 +320,35 @@ class TestNodesData(unittest.TestCase):
     expected = nd.get(NodeDataIdx.dist_next)[-2]
     self.assertAlmostEqual(nd.distance_to_end(nd.count - 2, 0.), expected)
 
+  def test_distance_to_node(self):
+    mockRouteData_02_03.reset()
+    way_relations = mockRouteData_02_03.wrs
+    wr_index = mockRouteData_02_03.way_collection.wr_index
+
+    nd = NodesData(way_relations, wr_index)
+    dist_to_node_ahead = 10.
+    node_id = 1887995486  # Some node id in the middle of the way. idx 50
+    node_idx = np.nonzero(nd.get(NodeDataIdx.node_id) == node_id)[0][0]
+
+    # none when ahead_idx is none.
+    self.assertIsNone(nd.distance_to_node(node_id, None, dist_to_node_ahead))
+
+    # From the begining
+    expected = nd.get(NodeDataIdx.dist_route)[node_idx]
+    self.assertAlmostEqual(nd.distance_to_node(node_id, 1, nd.get(NodeDataIdx.dist_next)[0]), expected)
+
+    # From the end
+    expected = -np.sum(nd.get(NodeDataIdx.dist_next)[node_idx:])
+    self.assertAlmostEqual(nd.distance_to_node(node_id, len(nd.get(NodeDataIdx.node_id)) - 1, 0.), expected)
+
+    # From some node behind including dist to node ahead
+    ahead_idx = node_idx - 10
+    expected = np.sum(nd.get(NodeDataIdx.dist_next)[ahead_idx:node_idx]) + dist_to_node_ahead
+    self.assertAlmostEqual(nd.distance_to_node(node_id, ahead_idx, dist_to_node_ahead), expected)
+
+    # From some node ahead including dist to node ahead
+    ahead_idx = node_idx + 10
+    expected = -np.sum(nd.get(NodeDataIdx.dist_next)[node_idx:ahead_idx]) + dist_to_node_ahead
+    self.assertAlmostEqual(nd.distance_to_node(node_id, ahead_idx, dist_to_node_ahead), expected)
+
 # TODO: Missing tests for curvatures_speed_limit_sections_ahead and possible_divertions

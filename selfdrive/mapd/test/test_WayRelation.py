@@ -9,7 +9,8 @@ from selfdrive.mapd.lib.WayRelation import WayRelation, is_osm_time_condition_ac
   conditional_speed_limit_for_osm_tag_limit_string, speed_limit_for_osm_tag_limit_string
 from selfdrive.mapd.config import LANE_WIDTH
 from selfdrive.mapd.lib.geo import DIRECTION, R, vectors
-from selfdrive.mapd.test.mock_data import mockOSMWay_01_01_LongCurvy, mockOSMWay_01_02_Loop
+from selfdrive.mapd.test.mock_data import mockOSMWay_01_01_LongCurvy, mockOSMWay_01_02_Loop, \
+  mockOSMWay_02_01_CurvyTownWithIntersections
 
 
 class TestWayRelationFileFunctions(unittest.TestCase):
@@ -188,6 +189,7 @@ class TestWayRelation(unittest.TestCase):
       [0.91344672, 0.23475751]])
 
     self.assertEqual(wayRelation.way.id, 179532213)
+    self.assertIsNone(wayRelation.parent_wr_id)
     self.assertEqual(wayRelation.direction, DIRECTION.NONE)
     self.assertEqual(wayRelation._speed_limit, None)
     self.assertEqual(wayRelation._one_way, 'yes')
@@ -201,6 +203,12 @@ class TestWayRelation(unittest.TestCase):
     assert_array_almost_equal(wayRelation._way_bearings, way_bearings_expected)
     assert_array_almost_equal(wayRelation.bbox, bbox_expected)
     self.assertEqual(wayRelation.edge_nodes_ids, [wayRelation.way.nodes[0].id, wayRelation.way.nodes[-1].id])
+
+  def test_way_relation_init_with_parent(self):
+    wayRelation = WayRelation(mockOSMWay_01_01_LongCurvy, parent=WayRelation(mockOSMWay_01_02_Loop))
+
+    self.assertEqual(wayRelation.way.id, 179532213)
+    self.assertEqual(wayRelation.parent_wr_id, 29233907)
 
   def test_way_relation_equality(self):
     wayRelation1 = WayRelation(mockOSMWay_01_01_LongCurvy)
@@ -223,6 +231,17 @@ class TestWayRelation(unittest.TestCase):
     wayRelation = WayRelation(mockOSMWay_01_01_LongCurvy)
 
     self.assertEqual(wayRelation.id, 179532213)
+
+  def test_way_relation_road_name(self):
+    # road name when no tag for name or ref
+    wayRelation = WayRelation(mockOSMWay_01_02_Loop)
+    self.assertIsNone(wayRelation.road_name)
+    # road name based on ref tag
+    wayRelation = WayRelation(mockOSMWay_01_01_LongCurvy)
+    self.assertEqual(wayRelation.road_name, "B 96")
+    # road name based on name tag
+    wayRelation = WayRelation(mockOSMWay_02_01_CurvyTownWithIntersections)
+    self.assertEqual(wayRelation.road_name, "Hauptstraße")
 
   def test_way_relation_update_resets_on_update(self):
     wayRelation = WayRelation(mockOSMWay_01_01_LongCurvy)
@@ -564,6 +583,46 @@ class TestWayRelation(unittest.TestCase):
     coords = wayRelation.node_before_edge_coordinates(wayRelation.way.nodes[-1].id)
     coords_e = np.radians(np.array([wayRelation.way.nodes[-2].lat, wayRelation.way.nodes[-2].lon], dtype=float))
     assert_array_almost_equal(coords, coords_e)
+
+  def test_way_relation_split_no_matching_node(self):
+    wayRelation = WayRelation(mockOSMWay_01_01_LongCurvy)
+
+    wrs = wayRelation.split(0)
+    self.assertEqual(len(wrs), 0)
+
+  def test_way_relation_split_use_correct_ids(self):
+    wayRelation = WayRelation(mockOSMWay_01_01_LongCurvy)
+
+    wrs = wayRelation.split(wayRelation._nodes_ids[5], [-100, -200])
+    self.assertEqual(wrs[0].id, -100)
+    self.assertEqual(wrs[1].id, -200)
+
+  def test_way_relation_split_on_edge_node(self):
+    wayRelation = WayRelation(mockOSMWay_01_01_LongCurvy)
+    edge_node_ids = wayRelation.edge_nodes_ids
+
+    for edge_node_id in edge_node_ids:
+      wrs = wayRelation.split(edge_node_id)
+      self.assertEqual(len(wrs), 1)
+      self.assertEqual(wrs[0], wayRelation)
+      self.assertEqual(wrs[0].way.tags, wayRelation.way.tags)
+
+  def test_way_relation_split_on_internal_node(self):
+    wayRelation = WayRelation(mockOSMWay_01_01_LongCurvy)
+    way_ids = [-10, -20]
+
+    for idx, node_id in enumerate(wayRelation._nodes_ids):
+      if idx == 0 or idx == len(wayRelation._nodes_ids) - 1:
+        continue
+      wrs = wayRelation.split(node_id, way_ids)
+      self.assertEqual(len(wrs), 2)
+      assert_array_almost_equal(wrs[0]._nodes_ids, wayRelation._nodes_ids[:idx + 1])
+      assert_array_almost_equal(wrs[1]._nodes_ids, wayRelation._nodes_ids[idx:])
+      self.assertIn(node_id, wrs[0].edge_nodes_ids)
+      self.assertIn(node_id, wrs[1].edge_nodes_ids)
+      self.assertEqual(wrs[0].way.tags, wayRelation.way.tags)
+      self.assertEqual(wrs[1].way.tags, wayRelation.way.tags)
+      self.assertEqual(way_ids, [wr.id for wr in wrs])
 
   # Helpers
   def make_wayRelation_location_dirty(self, wayRelation):
